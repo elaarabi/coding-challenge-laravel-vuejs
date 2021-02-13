@@ -32,4 +32,6 @@ npm install
 - Vuejs CRUD and pagination and file upload example
 - API tests
 
+## Check index.png and form.png for screen shots.
+
 Enjoy :)
