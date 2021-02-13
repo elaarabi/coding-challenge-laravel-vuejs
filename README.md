@@ -30,6 +30,7 @@ npm install
 - Services
 - Factory
 - Vuejs CRUD and pagination and file upload example
+- Client form validation
 - API tests
 
 ## Check index.png and form.png for screen shots.
