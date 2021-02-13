@@ -11,21 +11,26 @@
         <div class="form card mb-4 collapse" id="add-product">
             <form @submit.prevent="addProduct">
                 <h2>Product Form</h2>
-                <div class="form-group">
+                <div class="form-group" :class="{ 'has-error': $v.product.name.$error }">
                     <input type="text" class="form-control" placeholder="Name" v-model="product.name">
+                    <div class="error" v-if="!$v.product.name.required">Name is required.</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{ 'has-error': $v.product.description.$error }">
+                    <div class="error" v-if="!$v.product.description.required">Description is required.</div>
                     <textarea class="form-control" placeholder="Description" cols="30" rows="10"
                               v-model="product.description"></textarea>
                 </div>
-                <div class="form-group">
-                    <input type="number" class="form-control" placeholder="Price" v-model="product.price">
+                <div class="form-group" :class="{ 'has-error': $v.product.price.$error }">
+                    <input type="text" class="form-control" placeholder="Price" v-model="product.price">
+                    <div class="error" v-if="!$v.product.price.required">Price is required.</div>
+                    <div class="error" v-if="!$v.product.price.decimal">Is not a number.</div>
                 </div>
-                <div class="form-group">
+                <div class="form-group" :class="{ 'has-error': $v.product.categories.$error }">
                     <label>Select Categories</label>
                     <multiple_categories v-model="product.categories">
 
                     </multiple_categories>
+                    <div class="error" v-if="!$v.product.categories.required">Categories required.</div>
                 </div>
                 <div class="form-group">
                     <input type="file" accept="image/*" v-on:change="handleFileUpload">
@@ -53,8 +58,6 @@
                 <paginate
                     v-model="page"
                     :page-count="totalPages"
-                    :page-range="1"
-                    :margin-pages="2"
                     :click-handler="pageHandler"
                     :prev-text="'Prev'"
                     :next-text="'Next'"
@@ -67,8 +70,10 @@
                 </paginate>
             </nav>
             <div class="row">
-                <div class="card mb-2 col-4 justify-content-center" v-for="product in products" v-bind:key="product.id">
-                    <img :src="product.image" style="max-width: 350px;" class="card-img-top"
+                <div class="card mb-2 pt-2 col-4 justify-content-center" v-for="product in products" v-bind:key="product.id">
+                    <img v-if="product.image" :src="product.image" class="card-img-top"
+                         :alt="product.name">
+                    <img v-if="!product.image" src="/images/empty.png" class="card-img-top"
                          :alt="product.name">
                     <div class="card-body">
                         <h5 class="card-title float-right">{{ product.price }} $</h5>
@@ -81,8 +86,6 @@
                 <paginate
                     v-model="page"
                     :page-count="totalPages"
-                    :page-range="1"
-                    :margin-pages="2"
                     :click-handler="pageHandler"
                     :prev-text="'Prev'"
                     :next-text="'Next'"
@@ -100,6 +103,19 @@
 <style>
 .select2 {
     min-width: 100% !important;
+}
+
+.error {
+    display: none;
+}
+
+.has-error input {
+    border-color: red;
+}
+
+.has-error .error {
+    color: red;
+    display: block;
 }
 
 .up-arrow {
@@ -127,15 +143,22 @@
 }
 </style>
 <script>
+
 import Categories from './Categories'
 import MultipleCategories from './MultipleCategories'
 import Paginate from 'vuejs-paginate'
+import Vuelidate from "vuelidate";
+import Vue from "vue";
+
+Vue.use(Vuelidate);
+import {required, maxLength, decimal} from 'vuelidate/lib/validators'
 
 export default {
     components: {
         'categories': Categories,
         'multiple_categories': MultipleCategories,
         'paginate': Paginate,
+        'Vuelidate': Vuelidate
     },
     data() {
         return {
@@ -154,6 +177,23 @@ export default {
             }
         }
     },
+    validations: {
+        product: {
+            name: {
+                required,
+            },
+            description: {
+                required,
+            },
+            price: {
+                required,
+                decimal
+            },
+            categories: {
+                required,
+            }
+        }
+    },
     created() {
         this.fetchProducts();
     },
@@ -162,6 +202,9 @@ export default {
          * Add Product Handler
          */
         addProduct() {
+            this.$v.product.$touch();
+            let vm = this;
+            if (this.$v.product.$error) return
             fetch('api/product', {
                 method: 'post',
                 body: JSON.stringify(this.product),
@@ -170,7 +213,14 @@ export default {
                 }
             }).then(res => res.json())
                 .then(data => {
-                    this.fetchProducts();
+                    this.product.name = '';
+                    this.product.description = '';
+                    this.product.price = '';
+                    this.product.image = '';
+                    this.product.categories = '';
+                    $('#select2-multiple').val(null).trigger('change');
+                    this.$v.$reset();
+                    vm.fetchProducts();
                 })
                 .catch(err => console.log(err));
         },

@@ -31,7 +31,6 @@ export default {
             .val(this.value)
             .trigger('change')
             .on('change', function () {
-                vm.$parent.fetchProducts($(this).val());
                 vm.$emit('input', $(this).val());
             });
     }
