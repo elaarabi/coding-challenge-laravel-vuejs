@@ -20,6 +20,9 @@ class DeleteCategory extends BaseCmd
      */
     protected $description = 'Delete Category';
 
+    /**
+     * @var CategoryService
+     */
     protected $service;
 
     /**
@@ -28,8 +31,8 @@ class DeleteCategory extends BaseCmd
      */
     public function __construct(CategoryService $categoryService)
     {
-        $this->service = $categoryService;
         parent::__construct();
+        $this->service = $categoryService;
     }
 
     /**

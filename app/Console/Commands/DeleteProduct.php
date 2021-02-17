@@ -20,6 +20,9 @@ class DeleteProduct extends BaseCmd
      */
     protected $description = 'Delete Product';
 
+    /**
+     * @var ProductService
+     */
     protected $service;
 
     /**
@@ -28,8 +31,8 @@ class DeleteProduct extends BaseCmd
      */
     public function __construct(ProductService $productService)
     {
-        $this->service = $productService;
         parent::__construct();
+        $this->service = $productService;
     }
 
     /**

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseRepository implements EloquentRepositoryInterface
 {
+    /**
+     * @var int elements per page
+     */
     public static int $perPage = 6;
     /**
      * @var Model
@@ -19,13 +22,11 @@ class BaseRepository implements EloquentRepositoryInterface
      */
     public function all(array $attributes)
     {
-        $query = $this->model;
+        $query = $this->model->newQuery();
         foreach ($attributes as $key => $val) {
             $query = $query->where($key, $val);
         }
-        return [
-            'data' => $query->take(self::$perPage)->get()
-        ];
+        return $query->take(self::$perPage)->get();
     }
 
     /**

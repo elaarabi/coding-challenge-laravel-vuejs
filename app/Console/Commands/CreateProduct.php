@@ -19,6 +19,10 @@ class CreateProduct extends BaseCmd
      * @var string
      */
     protected $description = 'Create Product';
+
+    /**
+     * @var ProductService
+     */
     protected $service;
 
     /**
@@ -27,8 +31,8 @@ class CreateProduct extends BaseCmd
      */
     public function __construct(ProductService $productService)
     {
-        $this->service = $productService;
         parent::__construct();
+        $this->service = $productService;
     }
 
     /**
@@ -38,7 +42,7 @@ class CreateProduct extends BaseCmd
      */
     public function handle()
     {
-        $this->formatResult($this->service->createOrUpdate([
+        $this->formatResult($this->service->create([
             'name' => $this->ask('Name ?'),
             'description' => $this->ask('Description ?'),
             'price' => (float)$this->ask('Price ?'),
