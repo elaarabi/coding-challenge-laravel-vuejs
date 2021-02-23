@@ -20,6 +20,9 @@ class CreateCategory extends BaseCmd
      */
     protected $description = 'Create Category';
 
+    /**
+     * @var CategoryService
+     */
     protected $service;
 
     /**
@@ -28,8 +31,8 @@ class CreateCategory extends BaseCmd
      */
     public function __construct(CategoryService $categoryService)
     {
-        $this->service = $categoryService;
         parent::__construct();
+        $this->service = $categoryService;
     }
 
     /**
@@ -39,8 +42,7 @@ class CreateCategory extends BaseCmd
      */
     public function handle()
     {
-
-        $this->formatResult($this->service->createOrUpdate([
+        $this->formatResult($this->service->create([
             'name' => $this->ask('Name ?'),
             'parent' => $this->ask('Parent category "ID" ?'),
         ]));
