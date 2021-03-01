@@ -42,9 +42,8 @@ class DeleteProduct extends Command
      */
     public function handle()
     {
-        $id = $this->argument('id');
-        $this->productService->delete($id);
         try {
+            $id = $this->argument('id');
             $this->productService->delete($id);
             $message = trans("products.removed");
             info($message);

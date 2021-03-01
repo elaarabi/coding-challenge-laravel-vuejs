@@ -14,13 +14,13 @@ interface ProductInterface
      * @param string $sortColumn
      * @param string $sortDirection
      * @return LengthAwarePaginator
-     * @throws QueryException
      */
     public function all(int $category_id = null, string $sortColumn = '', $sortDirection = 'asc'): LengthAwarePaginator;
 
     /**
      * @param array $attributes
      * @return Product
+     * @throws QueryException
      */
     public function create(array $attributes): Product;
 

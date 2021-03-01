@@ -12,8 +12,7 @@
             <form @submit.prevent="addProduct">
                 <h2>Product Form</h2>
                 <div class="form-group" :class="{ 'has-error': $v.product.name.$error }">
-                    <input type="text" class="form-control" placeholder="Name"
-                           v-model="product.name">
+                    <input type="text" class="form-control" placeholder="Name" v-model="product.name">
                     <div class="error" v-if="!$v.product.name.required">Name is required.</div>
                 </div>
                 <div class="form-group" :class="{ 'has-error': $v.product.description.$error }">
@@ -22,8 +21,7 @@
                               v-model="product.description"></textarea>
                 </div>
                 <div class="form-group" :class="{ 'has-error': $v.product.price.$error }">
-                    <input type="text" class="form-control" placeholder="Price"
-                           v-model="product.price">
+                    <input type="text" class="form-control" placeholder="Price" v-model="product.price">
                     <div class="error" v-if="!$v.product.price.required">Price is required.</div>
                     <div class="error" v-if="!$v.product.price.decimal">Is not a number.</div>
                 </div>
@@ -182,7 +180,7 @@ export default {
                 price: '',
                 image: ''
             },
-            categories:[]
+            categories: []
         }
     },
     validations: {

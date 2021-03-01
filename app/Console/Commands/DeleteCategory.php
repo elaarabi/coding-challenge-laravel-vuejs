@@ -42,9 +42,8 @@ class DeleteCategory extends Command
      */
     public function handle()
     {
-        $id = $this->argument('id');
-        $this->categoryService->delete($id);
         try {
+            $id = $this->argument('id');
             $this->categoryService->delete($id);
             $message = trans("categories.removed");
             info($message);
