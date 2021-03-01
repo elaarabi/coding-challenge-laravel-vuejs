@@ -29,6 +29,8 @@
         "audit": "0.0.6",
         "fix": "0.0.6",
         "select2": "^4.1.0-rc.0",
+        "toastr": "^2.1.4",
+        "vue-toastr-2": "0.0.10",
         "vuejs-paginate": "^2.1.0",
         "vuelidate": "^0.7.6"
     }

@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App;
-use App\Interfaces\ProductInterface;
-use App\Interfaces\CategoryInterface;
+use App\Repositories\Contracts\Product\ProductInterface;
+use App\Repositories\Contracts\Product\CategoryInterface;
 use Illuminate\Support\ServiceProvider;
 use App\Services\ProductService;
 use App\Services\CategoryService;

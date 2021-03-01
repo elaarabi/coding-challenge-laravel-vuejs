@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ProductService;
+use Illuminate\Console\Command;
+use App\Services\Product\ProductService;
+use Exception;
 
-class DeleteProduct extends BaseCmd
+class DeleteProduct extends Command
 {
     /**
      * The name and signature of the console command.
@@ -23,7 +25,7 @@ class DeleteProduct extends BaseCmd
     /**
      * @var ProductService
      */
-    protected $service;
+    protected ProductService $productService;
 
     /**
      * DeleteProduct constructor.
@@ -32,17 +34,22 @@ class DeleteProduct extends BaseCmd
     public function __construct(ProductService $productService)
     {
         parent::__construct();
-        $this->service = $productService;
+        $this->productService = $productService;
     }
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-        $this->formatResult($this->service->delete($this->argument('id')));
-        return 0;
+        $id = $this->argument('id');
+        $this->productService->delete($id);
+        try {
+            $this->productService->delete($id);
+            $message = trans("products.removed");
+            info($message);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 }

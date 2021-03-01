@@ -12,7 +12,8 @@
             <form @submit.prevent="addProduct">
                 <h2>Product Form</h2>
                 <div class="form-group" :class="{ 'has-error': $v.product.name.$error }">
-                    <input type="text" class="form-control" placeholder="Name" v-model="product.name">
+                    <input type="text" class="form-control" placeholder="Name"
+                           v-model="product.name">
                     <div class="error" v-if="!$v.product.name.required">Name is required.</div>
                 </div>
                 <div class="form-group" :class="{ 'has-error': $v.product.description.$error }">
@@ -21,7 +22,8 @@
                               v-model="product.description"></textarea>
                 </div>
                 <div class="form-group" :class="{ 'has-error': $v.product.price.$error }">
-                    <input type="text" class="form-control" placeholder="Price" v-model="product.price">
+                    <input type="text" class="form-control" placeholder="Price"
+                           v-model="product.price">
                     <div class="error" v-if="!$v.product.price.required">Price is required.</div>
                     <div class="error" v-if="!$v.product.price.decimal">Is not a number.</div>
                 </div>
@@ -70,7 +72,8 @@
                 </paginate>
             </nav>
             <div class="row">
-                <div class="card mb-2 pt-2 col-4 justify-content-center" v-for="product in products" v-bind:key="product.id">
+                <div class="card mb-2 pt-2 col-4 justify-content-center" v-for="product in products"
+                     v-bind:key="product.id">
                     <img v-if="product.image" :src="product.image" class="card-img-top"
                          :alt="product.name">
                     <img v-if="!product.image" src="/images/empty.png" class="card-img-top"
@@ -149,8 +152,12 @@ import MultipleCategories from './MultipleCategories'
 import Paginate from 'vuejs-paginate'
 import Vuelidate from "vuelidate";
 import Vue from "vue";
+import VueToastr2 from 'vue-toastr-2'
+import 'vue-toastr-2/dist/vue-toastr-2.min.css'
 
 Vue.use(Vuelidate);
+window.toastr = require('toastr');
+Vue.use(VueToastr2);
 import {required, maxLength, decimal} from 'vuelidate/lib/validators'
 
 export default {
@@ -166,15 +173,16 @@ export default {
             count: 0,
             totalPages: 0,
             products: [],
-            sort: 'name',
-            sortWay: '',
+            sortBy: 'name',
+            sortDirection: 'asc',
             product: {
                 id: '',
                 name: '',
                 description: '',
                 price: '',
                 image: ''
-            }
+            },
+            categories:[]
         }
     },
     validations: {
@@ -212,7 +220,11 @@ export default {
                     'content-type': 'application/json'
                 }
             }).then(res => res.json())
-                .then(data => {
+                .then(res => {
+                    if (res.data === undefined) {
+                        return this.$toastr.error(res.message);
+                    }
+                    this.$toastr.success(res.message);
                     this.product.name = '';
                     this.product.description = '';
                     this.product.price = '';
@@ -222,7 +234,7 @@ export default {
                     this.$v.$reset();
                     vm.fetchProducts();
                 })
-                .catch(err => console.log(err));
+                .catch(err => this.$toastr.error(err));
         },
         /**
          * File to base64 reader
@@ -247,7 +259,7 @@ export default {
                 category = null;
             }
             this.category = category;
-            let url = 'api/products?sort=' + this.sortWay + this.sort;
+            let url = 'api/products?sortBy=' + this.sortBy + '&sortDirection=' + this.sortDirection;
             if (this.category) {
                 url += '&category_id=' + this.category;
             }
@@ -257,12 +269,13 @@ export default {
             fetch(url)
                 .then(res => res.json())
                 .then(res => {
-                    this.products = res.data.models;
-                    this.count = res.data.count;
-                    this.totalPages = res.data.pages;
-                }).catch(function (error) {
-                console.log('Fetch Error:', error);
-            });
+                    if (res.data === undefined) {
+                        return this.$toastr.error(res.message);
+                    }
+                    this.products = res.data.data;
+                    this.count = res.data.total;
+                    this.totalPages = res.data.last_page;
+                }).catch(err => console.log(err));
         },
         /**
          * Sort products
@@ -270,14 +283,14 @@ export default {
          */
         sortProducts(event) {
             this.page = 0;
-            if (event.target.id === this.sort) {
-                this.sortWay = this.sortWay === '' ? '-' : '';
+            if (event.target.id === this.sortBy) {
+                this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
             } else {
-                this.sort = event.target.id;
-                this.sortWay = '';
+                this.sortBy = event.target.id;
+                this.sortDirection = 'asc';
             }
             $('.sort-arrow').removeClass('up-arrow').removeClass('down-arrow');
-            if (this.sortWay === '-') {
+            if (this.sortDirection === 'desc') {
                 $(event.target).find('i').addClass('up-arrow');
             } else {
                 $(event.target).find('i').addClass('down-arrow');

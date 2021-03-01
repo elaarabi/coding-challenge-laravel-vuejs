@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Services\CategoryService;
+use App\Services\Product\CategoryService;
+use Exception;
+use Illuminate\Console\Command;
 
-class CreateCategory extends BaseCmd
+class CreateCategory extends Command
 {
     /**
      * The name and signature of the console command.
@@ -23,7 +25,7 @@ class CreateCategory extends BaseCmd
     /**
      * @var CategoryService
      */
-    protected $service;
+    protected CategoryService $categoryService;
 
     /**
      * CreateCategory constructor.
@@ -32,20 +34,25 @@ class CreateCategory extends BaseCmd
     public function __construct(CategoryService $categoryService)
     {
         parent::__construct();
-        $this->service = $categoryService;
+        $this->categoryService = $categoryService;
     }
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-        $this->formatResult($this->service->create([
-            'name' => $this->ask('Name ?'),
-            'parent' => $this->ask('Parent category "ID" ?'),
-        ]));
-        return 0;
+        try {
+            $name = $this->ask('Name ?');
+            $parent = $this->ask('Parent category "ID" ?');
+            $category = $this->categoryService->create([
+                'name' => $name,
+                'parent' => $parent,
+            ]);
+            $message = trans("categories.created", ['id' => $category->id]);
+            info($message);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 }

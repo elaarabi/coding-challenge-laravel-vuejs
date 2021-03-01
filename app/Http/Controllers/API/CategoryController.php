@@ -3,26 +3,24 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
-use App\Services\CategoryService;
-use App\Traits\ResponseAPI;
+use App\Services\Product\CategoryService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
-    use ResponseAPI;
 
     /**
      * @var CategoryService
      */
-    protected CategoryService $service;
+    protected CategoryService $categoryService;
 
     /**
      * @param CategoryService $categoryService
      */
     public function __construct(CategoryService $categoryService)
     {
-        $this->service = $categoryService;
+        $this->categoryService = $categoryService;
     }
 
     /**
@@ -32,6 +30,16 @@ class CategoryController extends Controller
      */
     public function search(Request $request): JsonResponse
     {
-        return $this->formatResponse($this->service->search($request->get('term')));
+        try {
+            $name = $request->get('term');
+            $categories = $this->categoryService->search($name);
+            return response()->json([
+                'data' => $categories
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }

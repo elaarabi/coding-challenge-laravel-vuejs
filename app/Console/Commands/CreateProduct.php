@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Services\ProductService;
+use App\Services\Product\ProductService;
+use Illuminate\Console\Command;
+use Exception;
 
-class CreateProduct extends BaseCmd
+class CreateProduct extends Command
 {
     /**
      * The name and signature of the console command.
@@ -23,7 +25,7 @@ class CreateProduct extends BaseCmd
     /**
      * @var ProductService
      */
-    protected $service;
+    protected ProductService $productService;
 
     /**
      * CreateProduct constructor.
@@ -32,23 +34,29 @@ class CreateProduct extends BaseCmd
     public function __construct(ProductService $productService)
     {
         parent::__construct();
-        $this->service = $productService;
+        $this->productService = $productService;
     }
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-        $this->formatResult($this->service->create([
-            'name' => $this->ask('Name ?'),
-            'description' => $this->ask('Description ?'),
-            'price' => (float)$this->ask('Price ?'),
-            'categories' => $this->ask('Categories IDS : separate with "," ?'),
-        ]));
-
-        return 0;
+        try {
+            $name = $this->ask('Name ?');
+            $description = $this->ask('Description ?');
+            $price = (float)$this->ask('Price ?');
+            $categories = $this->ask('Categories IDS : separate with "," ?');
+            $product = $this->productService->create([
+                'name' => $name,
+                'description' => $description,
+                'price' => $price,
+                'categories' => explode(',', $categories),
+            ]);
+            $message = trans("products.created", ['id' => $product->id]);
+            info($message);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 }

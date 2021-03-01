@@ -2,9 +2,11 @@
 
 namespace App\Console\Commands;
 
-use App\Services\CategoryService;
+use App\Services\Product\CategoryService;
+use Illuminate\Console\Command;
+use Exception;
 
-class DeleteCategory extends BaseCmd
+class DeleteCategory extends Command
 {
     /**
      * The name and signature of the console command.
@@ -23,7 +25,7 @@ class DeleteCategory extends BaseCmd
     /**
      * @var CategoryService
      */
-    protected $service;
+    protected CategoryService $categoryService;
 
     /**
      * DeleteCategory constructor.
@@ -32,17 +34,22 @@ class DeleteCategory extends BaseCmd
     public function __construct(CategoryService $categoryService)
     {
         parent::__construct();
-        $this->service = $categoryService;
+        $this->categoryService = $categoryService;
     }
 
     /**
      * Execute the console command.
-     *
-     * @return int
      */
     public function handle()
     {
-        $this->formatResult($this->service->delete($this->argument('id')));
-        return 0;
+        $id = $this->argument('id');
+        $this->categoryService->delete($id);
+        try {
+            $this->categoryService->delete($id);
+            $message = trans("categories.removed");
+            info($message);
+        } catch (Exception $e) {
+            error_log($e->getMessage());
+        }
     }
 }

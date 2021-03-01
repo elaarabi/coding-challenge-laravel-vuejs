@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Repositories\ProductRepository;
-use App\Repositories\CategoryRepository;
+use App\Repositories\Eloquent\Product\CategoryRepository;
+use App\Repositories\Eloquent\Product\ProductRepository;
 
 class RepositoryServiceProvider extends ServiceProvider
 {
@@ -26,10 +26,10 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('App\Interfaces\ProductInterface', function () {
-            return new ProductRepository(new CategoryRepository());
+        $this->app->singleton('App\Repositories\Contracts\Product\ProductInterface', function () {
+            return new ProductRepository();
         });
-        $this->app->singleton('App\Interfaces\CategoryInterface', function () {
+        $this->app->singleton('App\Repositories\Contracts\Product\CategoryInterface', function () {
             return new CategoryRepository();
         });
     }
